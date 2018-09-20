@@ -1,6 +1,6 @@
 """Class that handle client connections"""
 import socket
-
+from threading import Thread, Event
 UDP_PORT = 13702
 TCP_PORT = 13703
 
@@ -18,6 +18,22 @@ class Client:
     self.tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     self.tcp.bind(tcp_src)
 
+    self.available_servers = []
+
+    self.timeout_handle = Event()
+
+  def wait_servers_response(self):
+    while True:
+      data, _ = self.udp.recvfrom(1024)
+      print("received", data)
+
+      if self.timeout_handle.is_set():
+        break
+
   def search_servers(self):
     """Send udp broadcast to search for servers"""
     self.udp.sendto(b"MANDANDO BROADCAST", ('<broadcast>', UDP_PORT))
+    wait_response = Thread(target=self.wait_servers_response)
+    wait_response.start()
+    wait_response.join(timeout=1)
+    self.timeout_handle.set()
