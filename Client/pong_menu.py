@@ -5,6 +5,7 @@ import pygame
 from .scene_base import SceneBase
 
 WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 
 class PongMenu(SceneBase):
   """Menu Scene in Pong-Lan game."""
@@ -15,9 +16,12 @@ class PongMenu(SceneBase):
     self.nic_info = []
     self.nic_info_text = []
 
+    # Available servers to connect
+    self.server_list = []
+    self.server_list_text = []
 
     # PONG title
-    font = pygame.font.Font(path.join(path.dirname(__file__), "src", "bit5x3.ttf"), 130)
+    font = pygame.font.Font(path.join(path.dirname(__file__), "src", "bit5x3.ttf"), 150)
     self.pong_text = font.render("PONG", False, WHITE)
 
     # Servers title
@@ -43,19 +47,32 @@ class PongMenu(SceneBase):
     # List of NIC
     self.nic_info = socket.gethostbyname_ex(socket.gethostname())
     # Set font used to text
-    font = pygame.font.Font(path.join(path.dirname(__file__), "src", "bit5x3.ttf"), 40)
+    font = pygame.font.Font(path.join(path.dirname(__file__), "src", "bit5x3.ttf"), 35)
     # For each NIC, create text surface and append it to a list
     for ip_addr in self.nic_info[2]:
       text = font.render(ip_addr, False, WHITE)
       self.nic_info_text.append({'ip': ip_addr, 'text': text})
 
+  def load_servers_text(self, server_list):
+    """Generate servers list text based on received msg from main"""
+    self.server_list = server_list
+    font = pygame.font.Font(path.join(path.dirname(__file__), "src", "bit5x3.ttf"), 35)
+    for server in server_list:
+      text = font.render(server['tcp_addr'][0] + ':' + \
+      str(server['tcp_addr'][1]), False, WHITE)
+      self.server_list_text.append({'tcp_addr': server['tcp_addr'], 'text': text})
+
   def process_events(self):
     """Process pygame events"""
     pass
 
-  def update(self, events, pressed_keys):
+  def update(self, msg):
     """Update local variables"""
     self.mouse_pos = pygame.mouse.get_pos()
+
+    if msg['update_servers']:
+      self.load_servers_text(msg['servers'])
+
 
   def render_server_pick(self, surface):
     """Draw rectangle with list of servers"""
@@ -76,6 +93,13 @@ class PongMenu(SceneBase):
     # Servers Title text
     surface.blit(self.servers_text, (x_offset, \
     y_offset - self.servers_text.get_height()))
+
+    # Servers List
+    list_x_offset = x_offset + border_thick + 5
+    list_y_offset = y_offset + border_thick + 5
+    for elem in self.server_list_text:
+      elem['rect'] = surface.blit(elem['text'], (list_x_offset, list_y_offset))
+      list_y_offset += elem['text'].get_height()
 
   def render_options(self, surface):
     """Draw menu options"""
@@ -126,6 +150,18 @@ class PongMenu(SceneBase):
     y_pos = self.create_server_rect.y + self.create_server_rect.height//2
     if self.create_server_rect.collidepoint(self.mouse_pos):
       pygame.draw.circle(surface, WHITE, (x_pos, y_pos), radius)
+
+    # Nic Ip Options
+    for elem in self.nic_info_text:
+      if elem['rect'].collidepoint(self.mouse_pos):
+        # To do hover effect (also look for how to write TODO)
+        pygame.draw.rect(surface, BLACK, elem['rect'])
+    
+    # Server List
+    for elem in self.server_list_text:
+      if elem['rect'].collidepoint(self.mouse_pos):
+        # To do hover effect (also look for how to write TODO)
+        pygame.draw.rect(surface, BLACK, elem['rect'])
 
   def render(self, surface):
     """Render components from scene"""

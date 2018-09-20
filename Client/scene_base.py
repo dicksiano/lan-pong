@@ -8,7 +8,7 @@ class SceneBase:
     """Process events captured in screen"""
     print("Error: child class didn't override")
 
-  def update(self, events, pressed_keys):
+  def update(self, msg):
     """Updates scenes states"""
     print("Error: child class didn't override")
 
