@@ -1,7 +1,7 @@
 """Class that handle server connections"""
 import socket
 import json
-from threading import Thread, Event
+from threading import Thread
 
 UDP_PORT = 13702
 TCP_PORT = 13703
@@ -31,6 +31,7 @@ class Server:
     }
 
   def respond_bc(self):
+    """Responds udp broadcast"""
     while True:
       data, addr = self.udp.recvfrom(1024)
       print("received", data, "from", addr)
@@ -39,6 +40,7 @@ class Server:
         break
 
   def tcp_conn(self):
+    """Waits TCPs connection"""
     conn, client = self.tcp.accept()
     print(conn, client)
     self.num_conn += 1

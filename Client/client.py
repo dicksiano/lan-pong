@@ -16,7 +16,6 @@ class Client:
     udp_src = ('', randint(10000, 20000))
     self.udp.bind(udp_src)
 
-    tcp_src = (ip_addr, randint(10000, 20000))
     self.tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     self.available_servers = []
@@ -32,6 +31,7 @@ class Client:
         break
 
   def tcp_connect(self, addr):
+    """Connect to TCP addr"""
     self.tcp.connect(addr)
     msg = input()
     while msg != 'exit':
