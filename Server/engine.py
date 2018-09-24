@@ -1,6 +1,4 @@
 import random
-import sys
-import pygame
 
 # Constants
 WIDTH = 600
@@ -11,12 +9,6 @@ PAD_HEIGHT = 80
 PAD_VEL = 8
 HALF_PAD_WIDTH = PAD_WIDTH / 2
 HALF_PAD_HEIGHT = PAD_HEIGHT / 2
-self.ball_pos = [0,0]
-self.ball_vel = [0,0]
-self.paddle1_vel = 0
-self.paddle2_vel = 0
-self.l_score = 0
-self.r_score = 0
 
 class Engine:
     def __init__(self):
@@ -99,17 +91,4 @@ class Engine:
             self.paddle2_vel = 0
 
     def get_state():
-        return [self.paddle1_pos, self.paddle2_pos, self.ball_pos, self.l_score, self.r_score]
-    init()
-
-    while True:
-        for event in pygame.event.get():
-
-            if event.type == KEYDOWN:
-                keydown(event)
-            elif event.type == KEYUP:
-                keyup(event)
-            elif event.type == QUIT:
-                pygame.quit()
-                sys.exit()
-            
+        return [self.paddle1_pos, self.paddle2_pos, self.ball_pos, self.l_score, self.r_score]        
