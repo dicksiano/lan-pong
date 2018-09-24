@@ -1,14 +1,8 @@
 import random
 
-# Constants
-WIDTH = 600
-HEIGHT = 400       
-BALL_RADIUS = 20
-PAD_WIDTH = 8
-PAD_HEIGHT = 80
-PAD_VEL = 8
-HALF_PAD_WIDTH = PAD_WIDTH / 2
-HALF_PAD_HEIGHT = PAD_HEIGHT / 2
+import sys
+sys.path.append('../')
+import constants
 
 class Engine:
     def __init__(self):
@@ -70,9 +64,7 @@ class Engine:
             self.l_score += 1
             ball_init(False)
         
-    def keydown(event):
-        global self.paddle1_vel, self.paddle2_vel
-        
+    def keydown(event):        
         if event.key == K_UP:
             self.paddle2_vel = -PAD_VEL
         elif event.key == K_DOWN:
@@ -83,8 +75,6 @@ class Engine:
             self.paddle1_vel = PAD_VEL
 
     def keyup(event):
-        global self.paddle1_vel, self.paddle2_vel
-        
         if event.key in (K_w, K_s):
             self.paddle1_vel = 0
         elif event.key in (K_UP, K_DOWN):
