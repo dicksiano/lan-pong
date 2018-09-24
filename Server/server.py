@@ -2,6 +2,7 @@
 import socket
 import json
 from threading import Thread
+import engine
 
 UDP_PORT = 13702
 TCP_PORT = 13703
@@ -23,6 +24,7 @@ class Server:
 
     self.bc_response = self.gen_bc_response()
     self.num_conn = 0
+    self.engine = engine.Engine()
 
   def gen_bc_response(self):
     """Return model to broadcast response"""
