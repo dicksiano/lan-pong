@@ -4,6 +4,11 @@ import json
 import select
 from random import randint
 from threading import Thread, Event
+
+import sys
+sys.path.append('../')
+import constants
+
 UDP_PORT = 13702
 TCP_PORT = 13703
 
@@ -53,3 +58,16 @@ class Client:
     wait_response.join(timeout=1)
     self.timeout_handle.set()
     print("received", self.available_servers)
+
+
+def draw(canvas, ball_pos, paddle1_pos, paddle2_pos):
+  canvas.fill(BLACK)
+  pygame.draw.line(canvas, WHITE, [WIDTH / 2, 0],[WIDTH / 2, HEIGHT], 1)
+  pygame.draw.line(canvas, WHITE, [PAD_WIDTH, 0],[PAD_WIDTH, HEIGHT], 1)
+  pygame.draw.line(canvas, WHITE, [WIDTH - PAD_WIDTH, 0],[WIDTH - PAD_WIDTH, HEIGHT], 1)
+  pygame.draw.circle(canvas, WHITE, [WIDTH//2, HEIGHT//2], 70, 1)
+
+  # Paddles and Ball
+  pygame.draw.circle(canvas, RED, ball_pos, 20, 0)
+  pygame.draw.polygon(canvas, GREEN, [[paddle1_pos[0] - HALF_PAD_WIDTH, paddle1_pos[1] - HALF_PAD_HEIGHT], [paddle1_pos[0] - HALF_PAD_WIDTH, paddle1_pos[1] + HALF_PAD_HEIGHT], [paddle1_pos[0] + HALF_PAD_WIDTH, paddle1_pos[1] + HALF_PAD_HEIGHT], [paddle1_pos[0] + HALF_PAD_WIDTH, paddle1_pos[1] - HALF_PAD_HEIGHT]], 0)
+  pygame.draw.polygon(canvas, GREEN, [[paddle2_pos[0] - HALF_PAD_WIDTH, paddle2_pos[1] - HALF_PAD_HEIGHT], [paddle2_pos[0] - HALF_PAD_WIDTH, paddle2_pos[1] + HALF_PAD_HEIGHT], [paddle2_pos[0] + HALF_PAD_WIDTH, paddle2_pos[1] + HALF_PAD_HEIGHT], [paddle2_pos[0] + HALF_PAD_WIDTH, paddle2_pos[1] - HALF_PAD_HEIGHT]], 0)
