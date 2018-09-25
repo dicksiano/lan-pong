@@ -28,6 +28,11 @@ class PongMenu(SceneBase):
     font = pygame.font.Font(path.join(path.dirname(__file__), "src", "bit5x3.ttf"), 35)
     self.servers_text = font.render("SERVERS", False, WHITE)
 
+    # Refresh Servers title
+    font = pygame.font.Font(path.join(path.dirname(__file__), "src", "bit5x3.ttf"), 35)
+    self.refresh_server_text = font.render("@", False, WHITE)
+    self.refresh_server_rect = None
+
     # Play Title
     font = pygame.font.Font(path.join(path.dirname(__file__), "src", "bit5x3.ttf"), 45)
     self.play_text = font.render("PLAY", False, WHITE)
@@ -38,9 +43,24 @@ class PongMenu(SceneBase):
     self.create_server_text = font.render("CREATE SERVER", False, WHITE)
     self.create_server_rect = None
 
+    # Refresh Servers title
+    font = pygame.font.Font(path.join(path.dirname(__file__), "src", "bit5x3.ttf"), 45)
+    self.refresh_nic_text = font.render("@", False, WHITE)
+    self.refresh_nic_rect = None
+
     self.mouse_pos = (0, 0)
 
     self.load_ip_options()
+
+    # State Variables
+    self.s_render_hover = False
+    self.s_render_click = False
+    self.play_clicked = False
+    self.create_server_clicked = False
+    self.ref_servers_clicked = False
+    self.ref_nic_clicked = False
+    self.nic_selected = None
+    self.server_selected = None
 
   def load_ip_options(self):
     """Get ip of NIC used to create server"""
@@ -62,6 +82,15 @@ class PongMenu(SceneBase):
       str(server['tcp_addr'][1]), False, WHITE)
       self.server_list_text.append({'tcp_addr': server['tcp_addr'], 'text': text})
 
+  def debug_state(self):
+    """Debug state"""
+    print("RENDER HOVER: ", self.s_render_hover)
+    print("RENDER CLICK: ", self.s_render_click)
+    print("PLAY CLICKED: ", self.play_clicked)
+    print("CRSERV CLICK: ", self.create_server_clicked)
+    print("NIC SELECTED: ", self.nic_selected)
+    print("SERVER SELEC: ", self.server_selected)
+
   def process_events(self):
     """Process pygame events"""
     pass
@@ -69,10 +98,46 @@ class PongMenu(SceneBase):
   def update(self, msg):
     """Update local variables"""
     self.mouse_pos = pygame.mouse.get_pos()
+    for event in msg['filtered_events']:
+      if event.type == pygame.MOUSEMOTION:
+        self.s_render_hover = True
+      elif event.type == pygame.MOUSEBUTTONDOWN:
+        self.s_render_click = True
+        self.handle_click()
 
     if msg['update_servers']:
       self.load_servers_text(msg['servers'])
 
+  def handle_click(self):
+    """Handle click events"""
+
+    # Play Button
+    if self.play_rect.collidepoint(self.mouse_pos):
+      self.play_clicked = True
+
+    # Create Server Button
+    if self.create_server_rect.collidepoint(self.mouse_pos):
+      self.create_server_clicked = True
+
+    # Nic Ip Options
+    for elem in self.nic_info_text:
+      if elem['rect'].collidepoint(self.mouse_pos):
+        # To do hover effect (also look for how to write TODO)
+        self.nic_selected = elem
+
+    # Refresh Nic List
+    if self.refresh_nic_rect.collidepoint(self.mouse_pos):
+      self.ref_nic_clicked = True
+
+    # Server List
+    for elem in self.server_list_text:
+      if elem['rect'].collidepoint(self.mouse_pos):
+        # To do hover effect (also look for how to write TODO)
+        self.server_selected = elem
+
+    # Refresh Servers
+    if self.refresh_nic_rect.collidepoint(self.mouse_pos):
+      self.ref_servers_clicked = True
 
   def render_server_pick(self, surface):
     """Draw rectangle with list of servers"""
@@ -101,12 +166,17 @@ class PongMenu(SceneBase):
       elem['rect'] = surface.blit(elem['text'], (list_x_offset, list_y_offset))
       list_y_offset += elem['text'].get_height()
 
+    # Refresh Servers Button/Text
+    ref_x_offset = x_offset + rect_width - self.refresh_server_text.get_width()- 5
+    ref_y_offset = y_offset + rect_height - self.refresh_server_text.get_height() - 5
+    self.refresh_server_rect = surface.blit(self.refresh_server_text, (ref_x_offset, \
+    ref_y_offset))
+
   def render_options(self, surface):
     """Draw menu options"""
     x_offset = surface.get_width() * 5 // 100
     y_offset = surface.get_height() * 4 // 10
     rect_width = surface.get_width() * 40 // 100
-    # rect_height = surface.get_height() * 55 // 100
     border_thick = surface.get_width() // 100
 
     # Play Title text
@@ -127,21 +197,38 @@ class PongMenu(SceneBase):
     nic_rect_h = surface.get_height() * 95//100 - nic_rect_y
     pygame.draw.rect(surface, WHITE, pygame.Rect(nic_rect_x, \
     nic_rect_y, rect_width, nic_rect_h), border_thick)
+
     ## Ip Options
-    ip_x_offset = x_offset + border_thick + 5
+    ip_x_offset = x_offset + border_thick + 15
     ip_y_offset = nic_rect_y + border_thick + 5
     for elem in self.nic_info_text:
       elem['rect'] = surface.blit(elem['text'], (ip_x_offset, ip_y_offset))
       ip_y_offset += elem['text'].get_height()
 
+    ## Selected NIC
+    if self.nic_selected:
+      x_pos = self.nic_selected['rect'].x - 15
+      y_pos = self.nic_selected['rect'].y
+      width = 10
+      height = self.nic_selected['rect'].height - 5
+      pygame.draw.rect(surface, WHITE, pygame.Rect(x_pos,\
+      y_pos, width, height))
+
+    ## Refresh Servers Button/Text
+    ref_x_offset = nic_rect_x + rect_width - self.refresh_nic_text.get_width()- 5
+    ref_y_offset = nic_rect_y + nic_rect_h - self.refresh_nic_text.get_height() - 5
+    self.refresh_nic_rect = surface.blit(self.refresh_nic_text, (ref_x_offset, \
+    ref_y_offset))
+
   def render_mouse_hover(self, surface):
     """Mouse hover effects"""
-
+    is_hover = False
     # Play Button
     radius = 10
     x_pos = self.play_rect.x - 20
     y_pos = self.play_rect.y + self.play_rect.height//2
     if self.play_rect.collidepoint(self.mouse_pos):
+      is_hover = True
       pygame.draw.circle(surface, WHITE, (x_pos, y_pos), radius)
 
     # Create Server Button
@@ -149,19 +236,30 @@ class PongMenu(SceneBase):
     x_pos = self.create_server_rect.x - 20
     y_pos = self.create_server_rect.y + self.create_server_rect.height//2
     if self.create_server_rect.collidepoint(self.mouse_pos):
+      is_hover = True
       pygame.draw.circle(surface, WHITE, (x_pos, y_pos), radius)
 
     # Nic Ip Options
     for elem in self.nic_info_text:
       if elem['rect'].collidepoint(self.mouse_pos):
         # To do hover effect (also look for how to write TODO)
-        pygame.draw.rect(surface, BLACK, elem['rect'])
-    
+        is_hover = True
+        x_pos = elem['rect'].x - 15
+        y_pos = elem['rect'].y
+        width = 10
+        height = elem['rect'].height - 5
+        pygame.draw.rect(surface, WHITE, pygame.Rect(x_pos,\
+        y_pos, width, height))
+
     # Server List
     for elem in self.server_list_text:
       if elem['rect'].collidepoint(self.mouse_pos):
         # To do hover effect (also look for how to write TODO)
+        is_hover = True
         pygame.draw.rect(surface, BLACK, elem['rect'])
+
+    if not is_hover:
+      self.s_render_hover = False
 
   def render(self, surface):
     """Render components from scene"""
@@ -176,4 +274,5 @@ class PongMenu(SceneBase):
     self.render_options(surface)
 
     # Render Hover Effects
-    self.render_mouse_hover(surface)
+    if self.s_render_hover:
+      self.render_mouse_hover(surface)

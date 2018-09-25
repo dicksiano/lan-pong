@@ -1,6 +1,7 @@
 """Class that handle client connections"""
 import socket
 import json
+import select
 from random import randint
 from threading import Thread, Event
 UDP_PORT = 13702
@@ -8,11 +9,12 @@ TCP_PORT = 13703
 
 class Client:
   """Class that handle client connections"""
-  def __init__(self, **kwargs):
-    ip_addr = kwargs.get('ip', '')
+  def __init__(self):
+    # ip_addr = kwargs.get('ip', '')
 
     self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     self.udp.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    self.udp.setblocking(0)
     udp_src = ('', randint(10000, 20000))
     self.udp.bind(udp_src)
 
@@ -25,9 +27,12 @@ class Client:
   def wait_servers_response(self):
     """Function that handles servers response to broadcast"""
     while True:
-      data, _ = self.udp.recvfrom(1024)
-      self.available_servers.append(json.loads(data.decode()))
+      readable, _, _ = select.select([self.udp], [], [], 1)
+      if readable:
+        data, _ = self.udp.recvfrom(1024)
+        self.available_servers.append(json.loads(data.decode()))
       if self.timeout_handle.is_set():
+        print("ENCERRANDO ROLE")
         break
 
   def tcp_connect(self, addr):
