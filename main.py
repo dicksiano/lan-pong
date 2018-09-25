@@ -78,8 +78,10 @@ if __name__ == "__main__":
       else:
         msg['filtered_events'].append(event)
 
-    screen.fill(BLACK)
     active_scene.update(msg)
+
+
+    screen.fill(BLACK)
     active_scene.render(screen)
     render_fps(FONT, screen, floor(clock.get_fps()))
     pygame.display.update()
