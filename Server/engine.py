@@ -33,16 +33,16 @@ class Engine:
     """Update game state"""
     if self.paddle1_pos[1] > HALF_PAD_HEIGHT and self.paddle1_pos[1] < HEIGHT - HALF_PAD_HEIGHT:
       self.paddle1_pos[1] += self.paddle1_vel
-    elif self.paddle1_pos[1] == HALF_PAD_HEIGHT and self.paddle1_vel > 0:
+    elif self.paddle1_pos[1] <= HALF_PAD_HEIGHT and self.paddle1_vel > 0:
       self.paddle1_pos[1] += self.paddle1_vel
-    elif self.paddle1_pos[1] == HEIGHT - HALF_PAD_HEIGHT and self.paddle1_vel < 0:
+    elif self.paddle1_pos[1] >= HEIGHT - HALF_PAD_HEIGHT and self.paddle1_vel < 0:
       self.paddle1_pos[1] += self.paddle1_vel
 
     if self.paddle2_pos[1] > HALF_PAD_HEIGHT and self.paddle2_pos[1] < HEIGHT - HALF_PAD_HEIGHT:
       self.paddle2_pos[1] += self.paddle2_vel
-    elif self.paddle2_pos[1] == HALF_PAD_HEIGHT and self.paddle2_vel > 0:
+    elif self.paddle2_pos[1] <= HALF_PAD_HEIGHT and self.paddle2_vel > 0:
       self.paddle2_pos[1] += self.paddle2_vel
-    elif self.paddle2_pos[1] == HEIGHT - HALF_PAD_HEIGHT and self.paddle2_vel < 0:
+    elif self.paddle2_pos[1] >= HEIGHT - HALF_PAD_HEIGHT and self.paddle2_vel < 0:
       self.paddle2_pos[1] += self.paddle2_vel
 
     self.ball_pos[0] += int(self.ball_vel[0])
