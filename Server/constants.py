@@ -1,3 +1,4 @@
+"""Client Module Constants"""
 # Constants
 WIDTH = 800
 HEIGHT = 600
@@ -5,14 +6,14 @@ BALL_RADIUS = 20
 PAD_WIDTH = 8
 PAD_HEIGHT = 80
 PAD_VEL = 8
-HALF_PAD_WIDTH = int(PAD_WIDTH // 2)
-HALF_PAD_HEIGHT = int(PAD_HEIGHT // 2)
+HALF_PAD_WIDTH = PAD_WIDTH // 2
+HALF_PAD_HEIGHT = PAD_HEIGHT // 2
 
 # Color
-WHITE = (255,255,255)
-RED = (255,0,0)
-GREEN = (0,255,0)
-BLACK = (0,0,0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLACK = (0, 0, 0)
 
 # States
 INGAME = 0

@@ -1,7 +1,8 @@
 """Pong game Engine Class"""
 import random
 from math import floor
-from .constants import *
+from .constants import HEIGHT, WIDTH, HALF_PAD_HEIGHT, HALF_PAD_WIDTH,\
+BALL_RADIUS, PAD_WIDTH, PAD_VEL
 
 class Engine:
   """Pong Game Engine"""
@@ -84,9 +85,9 @@ class Engine:
         self.paddle2_vel = -PAD_VEL
       elif event == "K_DOWN":
         self.paddle2_vel = PAD_VEL
-    
 
-  def keyup(self, event, player):
+
+  def keyup(self, player):
     """Handle key up event"""
     if player == 0:
       self.paddle1_vel = 0

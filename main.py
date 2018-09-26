@@ -7,12 +7,12 @@ from Server.server import Server
 from Client.client import Client
 from Client.pong_menu import PongMenu
 from Client.game_scene import GameScene
-from Client.constants import *
+from Client.constants import WIDTH, HEIGHT, WHITE, MENU, INGAME, BLACK
 
-# "MVC" message model
 class Main:
   """Main program"""
   def __init__(self):
+  # "MVC" message model
     self.msg = {
         'filtered_events':[],
         'pressed_keys': [],
@@ -41,6 +41,8 @@ class Main:
     self.server = None
 
   def process_ev_to_client(self):
+    """Process events there will be sent to server, only\
+    send K_UP and K_DOWN related"""
     msg = []
     for event in self.msg['filtered_events']:
       if event.type == pygame.KEYDOWN:
@@ -138,11 +140,11 @@ class Main:
         self.active_scene.update(self.msg)
 
       self.screen.fill(BLACK)
-      
+
       if self.state == MENU:
         self.active_scene.render(self.screen)
       elif self.state == INGAME:
-        pad1, pad2, ball, scr1, scr2 = self.client.game_state
+        pad1, pad2, ball, _, _ = self.client.game_state
         self.active_scene.draw(self.screen, pad1, pad2, ball)
 
       self.render_fps()

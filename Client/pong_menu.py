@@ -3,9 +3,7 @@ from os import path
 import socket
 import pygame
 from .scene_base import SceneBase
-
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
+from .constants import WHITE
 
 class PongMenu(SceneBase):
   """Menu Scene in Pong-Lan game."""
@@ -268,7 +266,6 @@ class PongMenu(SceneBase):
     # Server List
     for elem in self.server_list_text:
       if elem['rect'].collidepoint(self.mouse_pos):
-        # To do hover effect (also look for how to write TODO)
         is_hover = True
         x_pos = elem['rect'].x - 15
         y_pos = elem['rect'].y

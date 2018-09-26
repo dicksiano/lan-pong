@@ -2,7 +2,6 @@
 import socket
 import json
 import select
-import logging
 from threading import Thread
 from .engine import Engine
 
@@ -46,15 +45,6 @@ class Server:
 
   def respond_bc(self):
     """Responds udp broadcast"""
-    # while True:
-    #   readable, _, _ = select.select([self.udp], [], [], 1)
-    #   if readable:
-    #     data, addr = self.udp.recvfrom(1024)
-    #     print("Server: received", data, "from", addr)
-    #     self.udp.sendto(json.dumps(self.bc_response).encode(), addr)
-    #   if self.num_conn >= 2:
-    #     print("Server: Fechando receptor Broadcast")
-    #     break
     if not self.in_game or self.num_conn < 2:
       data, addr = self.udp.recvfrom(1024)
       print("Server: received", data, "from", addr)
@@ -70,18 +60,13 @@ class Server:
     self.msg_queue[conn] = []
     self.cli_num[conn] = self.num_conn
     self.num_conn += 1
-    # while True:
-    #   msg = conn.recv(1024).decode()
-    #   if not msg:
-    #     break
-    #   print(client, msg)
-    # print('CABOU')
 
   def process_events(self, data, conn):
+    """Process received events from client to engine"""
     player_num = self.cli_num[conn]
     for event in data:
       if event[0] == "KEYUP":
-        self.engine.keyup(event[1], player_num)
+        self.engine.keyup(player_num)
       elif event[0] == "KEYDOWN":
         self.engine.keydown(event[1], player_num)
 
@@ -96,7 +81,7 @@ class Server:
         elif s is self.tcp:
           self.tcp_conn()
         else:
-          data, addr = s.recvfrom(1024)
+          data, _ = s.recvfrom(1024)
           print("Server: tcp received", data)
           if data:
             data = json.loads(data.decode())
@@ -106,25 +91,19 @@ class Server:
             self.msg_queue[s].append(self.engine.get_state())
             if s not in self.outputs:
               self.outputs.append(s)
-          # else:
-          #   if s in self.outputs:
-          #     self.outputs.remove(s)
-          #   self.inputs.remove(s)
-          #   s.close()
-          #   del self.msg_queue[s]
 
       for s in writable:
         if self.msg_queue[s]:
           next_msg = json.dumps(self.msg_queue[s].pop(0)).encode()
           s.sendall(next_msg)
 
-      # for s in exceptional:
-      #   print("Exceptional")
-      #   self.inputs.remove(s)
-      #   if s in self.outputs:
-      #     self.outputs.remove(s)
-      #   s.close()
-      #   del self.msg_queue[s]
+      for s in exceptional:
+        print("Exceptional")
+        self.inputs.remove(s)
+        if s in self.outputs:
+          self.outputs.remove(s)
+        s.close()
+        del self.msg_queue[s]
 
       if self.quit:
         print("Server: end")
@@ -134,9 +113,3 @@ class Server:
     """Wait connections from two players"""
     server = Thread(target=self.running_server)
     server.start()
-    # udp_conn = Thread(target=self.respond_bc)
-    # udp_conn.start()
-    # tcp_conn1 = Thread(target=self.tcp_conn)
-    # tcp_conn1.start()
-    # tcp_conn2 = Thread(target=self.tcp_conn)
-    # tcp_conn2.start()
