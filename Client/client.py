@@ -62,6 +62,21 @@ class Client:
     #   msg = input()
     # self.tcp.close()
 
+  def handle_msg_errors(self, msg):
+    """Handle msg errors, when two messages are received \
+    from server and read like one: [[3, 140], [797, 300],\
+    [215, 299], 0, 0][[3, 140], [797, 300], [216, 300], 0, 0] -> \
+    [[3, 140], [797, 300], [216, 300], 0, 0]"""
+    idx = len(msg) - 1
+    open_bracket_count = 0
+    while idx>=0:
+      if msg[idx]== '[':
+        open_bracket_count+=1
+        if open_bracket_count == 4:
+          return msg[idx:]
+      idx -= 1
+    return msg
+
   def handle_tcp(self, msg):
     # print(msg)
     self.msg_queue.append(msg)
@@ -71,8 +86,9 @@ class Client:
       # print("WNTROU NO READABLE")
       data, addr = s.recvfrom(1024)
       if data:
-        self.game_state = json.loads(data.decode())
-        print("Client tcp:", self.game_state)
+        print("Client tcp:", data)
+        msg_filtered = self.handle_msg_errors(data.decode())
+        self.game_state = json.loads(msg_filtered)
 
     for s in writable:
       # print("WNTROU NO WRITABLE")
