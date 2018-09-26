@@ -3,7 +3,6 @@ import sys
 from os import path
 from math import floor
 import pygame
-import socket
 from Client.client import Client
 from Client.pong_menu import PongMenu
 
@@ -27,6 +26,23 @@ msg = {
     'update_servers': False
 }
 
+def handle_client_events(client):
+  """Handle Client events"""
+  if client.updated_state:
+    client.updated_state = False
+    msg['servers'] = client.available_servers
+    msg['update_servers'] = True
+
+def handle_acscene_events(active_scene):
+  """Handle Active Scene Events"""
+  if active_scene.ref_servers_clicked:
+    active_scene.ref_servers_clicked = False
+    client.search_servers()
+  
+  if active_scene.ref_nic_clicked:
+    active_scene.ref_nic_clicked = False
+    active_scene.load_ip_options()
+
 def render_fps(font, surface, fps):
   """Render fps text on screen"""
   fps_text = font.render(str(fps), True, WHITE)
@@ -49,8 +65,6 @@ if __name__ == "__main__":
   # Client / Server
   client = Client()
   client.search_servers()
-  msg['servers'] = client.available_servers
-  msg['update_servers'] = True
 
   while True:
     # print("oi")
@@ -78,6 +92,8 @@ if __name__ == "__main__":
       else:
         msg['filtered_events'].append(event)
 
+    handle_client_events(client)
+    handle_acscene_events(active_scene)
     active_scene.update(msg)
 
 
