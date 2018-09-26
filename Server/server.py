@@ -1,6 +1,7 @@
 """Class that handle server connections"""
 import socket
 import json
+import select
 from threading import Thread
 from .engine import Engine
 
@@ -35,10 +36,13 @@ class Server:
   def respond_bc(self):
     """Responds udp broadcast"""
     while True:
-      data, addr = self.udp.recvfrom(1024)
-      print("received", data, "from", addr)
-      self.udp.sendto(json.dumps(self.bc_response).encode(), addr)
-      if self.num_conn == 2:
+      readable, _, _ = select.select([self.udp], [], [], 1)
+      if readable:
+        data, addr = self.udp.recvfrom(1024)
+        print("Server: received", data, "from", addr)
+        self.udp.sendto(json.dumps(self.bc_response).encode(), addr)
+      if self.num_conn >= 2:
+        print("Server: Fechando receptor Broadcast")
         break
 
   def tcp_conn(self):

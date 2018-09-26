@@ -19,89 +19,109 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 # "MVC" message model
-msg = {
-    'filtered_events':[],
-    'pressed_keys': [],
-    'servers': [],
-    'update_servers': False
-}
+class Main:
+  """Main program"""
+  def __init__(self):
+    self.msg = {
+        'filtered_events':[],
+        'pressed_keys': [],
+        'servers': [],
+        'update_servers': False
+    }
 
-def handle_client_events(client):
-  """Handle Client events"""
-  if client.updated_state:
-    client.updated_state = False
-    msg['servers'] = client.available_servers
-    msg['update_servers'] = True
+    # pygame statements
+    pygame.init()
+    pygame.display.set_caption('Pong-Lan')
+    self.clock = pygame.time.Clock()
+    self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-def handle_acscene_events(active_scene):
-  """Handle Active Scene Events"""
-  if active_scene.ref_servers_clicked:
-    active_scene.ref_servers_clicked = False
-    client.search_servers()
-  
-  if active_scene.ref_nic_clicked:
-    active_scene.ref_nic_clicked = False
-    active_scene.load_ip_options()
+    # Screens Statements
+    self.state = MENU
+    self.font = pygame.font.Font(path.join(path.dirname(__file__), \
+    "Client", "src", "bit5x3.ttf"), 12)
+    self.menu = PongMenu()
+    self.active_scene = self.menu
 
-def render_fps(font, surface, fps):
-  """Render fps text on screen"""
-  fps_text = font.render(str(fps), True, WHITE)
-  surface.blit(fps_text, (0, surface.get_height()-fps_text.get_height()))
+    # Client / Server
+    self.client = Client()
+    self.client.search_servers()
+
+    self.server = None
+
+  def handle_client_events(self, client):
+    """Handle Client events"""
+    if client.updated_state:
+      client.updated_state = False
+      self.msg['servers'] = client.available_servers
+      self.msg['update_servers'] = True
+
+  def handle_acscene_events(self):
+    """Handle Active Scene Events"""
+    if self.active_scene.ref_servers_clicked:
+      self.active_scene.ref_servers_clicked = False
+      self.client.search_servers()
+
+    if self.active_scene.ref_nic_clicked:
+      self.active_scene.ref_nic_clicked = False
+      self.active_scene.load_ip_options()
+
+    if self.active_scene.create_server_clicked:
+      self.active_scene.create_server_clicked = False
+      if self.active_scene.nic_selected:
+        pass
+      else:
+        print("Cannot create server: No IP selected")
+
+  def render_fps(self):
+    """Render fps text on screen"""
+    fps = floor(self.clock.get_fps())
+    fps_text = self.font.render(str(fps), True, WHITE)
+    self.screen.blit(fps_text, (0, self.screen.get_height()-fps_text.get_height()))
+
+  def run(self):
+    """Run main program"""
+    while True:
+      # print("oi")
+      # if state == MENU:
+      #   pass
+      # elif state == INGAME:
+      #   pass
+      self.msg['pressed_keys'] = pygame.key.get_pressed()
+      self.msg['filtered_events'] = []
+      for event in pygame.event.get():
+        quit_attempt = False
+        if event.type == pygame.QUIT:
+          quit_attempt = True
+        elif event.type == pygame.KEYDOWN:
+          alt_pressed = self.msg['pressed_keys'][pygame.K_LALT] or \
+          self.msg['pressed_keys'][pygame.K_RALT]
+          if event.key == pygame.K_ESCAPE:
+            quit_attempt = True
+          elif event.key == pygame.K_F4 and alt_pressed:
+            quit_attempt = True
+
+        if quit_attempt:
+          pygame.quit()
+          sys.exit()
+        else:
+          self.msg['filtered_events'].append(event)
+
+      self.handle_client_events(self.client)
+      self.handle_acscene_events()
+      self.active_scene.update(self.msg)
+
+
+      self.screen.fill(BLACK)
+      self.active_scene.render(self.screen)
+      self.render_fps()
+      pygame.display.update()
+
+      if self.msg['update_servers']:
+        self.msg['update_servers'] = False
+
+      self.clock.tick(60)
 
 
 if __name__ == "__main__":
-  # pygame statements
-  pygame.init()
-  clock = pygame.time.Clock()
-  screen = pygame.display.set_mode((WIDTH, HEIGHT))
-  pygame.display.set_caption('Pong-Lan')
-
-  # Screens Statements
-  state = MENU
-  FONT = pygame.font.Font(path.join(path.dirname(__file__), "Client", "src", "bit5x3.ttf"), 12)
-  menu = PongMenu()
-  active_scene = menu
-
-  # Client / Server
-  client = Client()
-  client.search_servers()
-
-  while True:
-    # print("oi")
-    # if state == MENU:
-    #   pass
-    # elif state == INGAME:
-    #   pass
-    msg['pressed_keys'] = pygame.key.get_pressed()
-    msg['filtered_events'] = []
-    for event in pygame.event.get():
-      quit_attempt = False
-      if event.type == pygame.QUIT:
-        quit_attempt = True
-      elif event.type == pygame.KEYDOWN:
-        alt_pressed = msg['pressed_keys'][pygame.K_LALT] or \
-        msg['pressed_keys'][pygame.K_RALT]
-        if event.key == pygame.K_ESCAPE:
-          quit_attempt = True
-        elif event.key == pygame.K_F4 and alt_pressed:
-          quit_attempt = True
-
-      if quit_attempt:
-        pygame.quit()
-        sys.exit()
-      else:
-        msg['filtered_events'].append(event)
-
-    handle_client_events(client)
-    handle_acscene_events(active_scene)
-    active_scene.update(msg)
-
-
-    screen.fill(BLACK)
-    active_scene.render(screen)
-    render_fps(FONT, screen, floor(clock.get_fps()))
-    pygame.display.update()
-
-    if msg['update_servers']: msg['update_servers'] = False
-
-    clock.tick(60)
+  MAIN = Main()
+  MAIN.run()
