@@ -49,12 +49,30 @@ class Main:
 
     self.server = None
 
-  def handle_client_events(self, client):
+  def process_ev_to_client(self):
+    msg = []
+    for event in self.msg['filtered_events']:
+      if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_UP:
+          msg.append(("KEYDOWN", "K_UP"))
+        elif event.key == pygame.K_DOWN:
+          msg.append(("KEYDOWN", "K_DOWN"))
+      elif event.type == pygame.KEYUP:
+        if event.key == pygame.K_UP:
+          msg.append(("KEYUP", "K_UP"))
+        elif event.key == pygame.K_DOWN:
+          msg.append(("KEYUP", "K_DOWN"))
+    return msg
+
+  def handle_client_events(self):
     """Handle Client events"""
-    if client.updated_state:
-      client.updated_state = False
-      self.msg['servers'] = client.available_servers
+    if self.client.updated_state:
+      self.client.updated_state = False
+      self.msg['servers'] = self.client.available_servers
       self.msg['update_servers'] = True
+
+    if self.client.connected:
+      self.client.handle_tcp(self.process_ev_to_client())
 
   def handle_acscene_events(self):
     """Handle Active Scene Events"""
@@ -70,7 +88,6 @@ class Main:
       self.active_scene.play_clicked = False
       if self.active_scene.server_selected:
         ip_addr = self.active_scene.server_selected['tcp_addr']
-        print(ip_addr)
         self.client.tcp_connect(tuple(ip_addr))
       else:
         print("Cannot play: No selected server")
@@ -121,7 +138,7 @@ class Main:
         else:
           self.msg['filtered_events'].append(event)
 
-      self.handle_client_events(self.client)
+      self.handle_client_events()
       self.handle_acscene_events()
       self.active_scene.update(self.msg)
 

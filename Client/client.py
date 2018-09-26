@@ -26,8 +26,12 @@ class Client:
     self.tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # self.tcp.setblocking(False)
 
-    self.available_servers = []
+    self.inputs = []
+    self.outputs = []
+    self.msg_queue = []
 
+    self.available_servers = []
+    self.connected = False
     self.updated_state = False
     self.timeout_handle = Event()
 
@@ -46,12 +50,42 @@ class Client:
   def tcp_connect(self, addr):
     """Connect to TCP addr"""
     self.tcp.connect(addr)
+    self.inputs.append(self.tcp)
+    self.outputs.append(self.tcp)
+    self.tcp.setblocking(False) 
+    self.connected = True
     print("Client: Conectado com servidor", addr)
     # msg = input()
     # while msg != 'exit':
     #   self.tcp.send(msg.encode())
     #   msg = input()
     # self.tcp.close()
+
+  def handle_tcp(self, msg):
+    # print(msg)
+    self.msg_queue.append(msg)
+    readable, writable, exceptional = select.select(\
+    self.inputs, self.outputs, self.inputs, 0.5)
+    for s in readable:
+      # print("WNTROU NO READABLE")
+      data, addr = s.recvfrom(1024)
+      print("Client tcp:", data)
+      if data:
+        pass
+
+    for s in writable:
+      # print("WNTROU NO WRITABLE")
+      if self.msg_queue:
+        next_msg = json.dumps(self.msg_queue.pop(0)).encode()
+        s.sendall(next_msg)
+
+    # for s in exceptional:
+    #   self.inputs.remove(s)
+    #   if s in self.outputs:
+    #     self.outputs.remove(s)
+    #   s.close()
+    #   del self.msg_queue[s]
+
 
   def search_servers(self):
     """Send udp broadcast to search for servers"""
