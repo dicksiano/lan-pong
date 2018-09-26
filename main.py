@@ -65,7 +65,7 @@ class Main:
     if self.client.connected:
       self.client.handle_tcp(self.process_ev_to_client())
 
-  def handle_acscene_events(self):
+  def handle_menu_events(self):
     """Handle Active Scene Events"""
     if self.active_scene.ref_servers_clicked:
       self.active_scene.ref_servers_clicked = False
@@ -128,14 +128,12 @@ class Main:
           sys.exit()
         else:
           self.msg['filtered_events'].append(event)
-<<<<<<< HEAD
 
       self.handle_client_events()
-=======
-      
-      self.handle_client_events(self.client)
->>>>>>> 062d4cc01c5a51fd75f3f123c4eece1d4c8a5438
-      self.handle_acscene_events()
+      if self.state == MENU:
+        self.handle_menu_events()
+      else:
+        pass
       if self.state == MENU:
         self.active_scene.update(self.msg)
 
