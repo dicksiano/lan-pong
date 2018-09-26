@@ -74,18 +74,23 @@ class Main:
         ip_addr = self.active_scene.server_selected['tcp_addr']
         print(ip_addr)
         self.client.tcp_connect(tuple(ip_addr))
+
+        print('\n\n\n\n aq\n\n\n')
+        self.state = INGAME
+        self.active_scene = self.game_scene
       else:
         print("Cannot play: No selected server")
 
-    if self.active_scene.create_server_clicked:
-      self.active_scene.create_server_clicked = False
-      if self.active_scene.nic_selected:
-        ip_addr = self.active_scene.nic_selected['ip']
-        self.active_scene.ref_servers_clicked = True
-        self.server = Server(ip=ip_addr)
-        self.server.wait_conn()
-      else:
-        print("Cannot create server: No IP selected")
+    if self.state == MENU:
+      if self.active_scene.create_server_clicked:
+        self.active_scene.create_server_clicked = False
+        if self.active_scene.nic_selected:
+          ip_addr = self.active_scene.nic_selected['ip']
+          self.active_scene.ref_servers_clicked = True
+          self.server = Server(ip=ip_addr)
+          self.server.wait_conn()
+        else:
+          print("Cannot create server: No IP selected")
 
   def render_fps(self):
     """Render fps text on screen"""
@@ -96,11 +101,6 @@ class Main:
   def run(self):
     """Run main program"""
     while True:
-      # print("oi")
-      # if state == MENU:
-      #   pass
-      # elif state == INGAME:
-      #   pass
       self.msg['pressed_keys'] = pygame.key.get_pressed()
       self.msg['filtered_events'] = []
       for event in pygame.event.get():
@@ -122,14 +122,19 @@ class Main:
           sys.exit()
         else:
           self.msg['filtered_events'].append(event)
-
+      
       self.handle_client_events(self.client)
       self.handle_acscene_events()
-      self.active_scene.update(self.msg)
-
+      if self.state == MENU:
+        self.active_scene.update(self.msg)
 
       self.screen.fill(BLACK)
-      self.active_scene.render(self.screen)
+      
+      if self.state == MENU:
+        self.active_scene.render(self.screen)
+      elif self.state == INGAME:
+        self.active_scene.draw(self.screen, [0,0], [0,0], [0,0])
+
       self.render_fps()
       pygame.display.update()
 
