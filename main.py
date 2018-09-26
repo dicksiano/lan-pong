@@ -3,6 +3,7 @@ import sys
 from os import path
 from math import floor
 import pygame
+from Server.server import Server
 from Client.client import Client
 from Client.pong_menu import PongMenu
 
@@ -68,7 +69,9 @@ class Main:
     if self.active_scene.create_server_clicked:
       self.active_scene.create_server_clicked = False
       if self.active_scene.nic_selected:
-        pass
+        ip_addr = self.active_scene.nic_selected['ip']
+        self.server = Server(ip=ip_addr)
+        self.server.wait_conn()
       else:
         print("Cannot create server: No IP selected")
 
