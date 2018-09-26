@@ -1,6 +1,6 @@
 # Constants
-WIDTH = 600
-HEIGHT = 400
+WIDTH = 800
+HEIGHT = 600
 BALL_RADIUS = 20
 PAD_WIDTH = 8
 PAD_HEIGHT = 80
@@ -13,3 +13,7 @@ WHITE = (255,255,255)
 RED = (255,0,0)
 GREEN = (0,255,0)
 BLACK = (0,0,0)
+
+# States
+INGAME = 0
+MENU = 1

@@ -7,18 +7,7 @@ from Server.server import Server
 from Client.client import Client
 from Client.pong_menu import PongMenu
 from Client.game_scene import GameScene
-
-# States
-INGAME = 0
-MENU = 1
-
-# Screen
-WIDTH = 800
-HEIGHT = 600
-
-# Colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
+from Client.constants import *
 
 # "MVC" message model
 class Main:
