@@ -66,6 +66,15 @@ class Main:
       self.active_scene.ref_nic_clicked = False
       self.active_scene.load_ip_options()
 
+    if self.active_scene.play_clicked:
+      self.active_scene.play_clicked = False
+      if self.active_scene.server_selected:
+        ip_addr = self.active_scene.server_selected['tcp_addr']
+        print(ip_addr)
+        self.client.tcp_connect(tuple(ip_addr))
+      else:
+        print("Cannot play: No selected server")
+
     if self.active_scene.create_server_clicked:
       self.active_scene.create_server_clicked = False
       if self.active_scene.nic_selected:
@@ -105,6 +114,8 @@ class Main:
             quit_attempt = True
 
         if quit_attempt:
+          if self.server:
+            self.server.quit = True
           pygame.quit()
           sys.exit()
         else:

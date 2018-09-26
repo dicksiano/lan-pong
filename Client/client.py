@@ -21,8 +21,10 @@ class Client:
     self.udp.setblocking(0)
     udp_src = ('', randint(10000, 20000))
     self.udp.bind(udp_src)
+    # self.udp.setblocking(False)
 
     self.tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # self.tcp.setblocking(False)
 
     self.available_servers = []
 
@@ -37,29 +39,28 @@ class Client:
         data, _ = self.udp.recvfrom(1024)
         self.available_servers.append(json.loads(data.decode()))
       else:
-        print("ENCERRANDO ROLE")
+        print("Client: Servers Responses received", self.available_servers)
         break
     self.updated_state = True
 
   def tcp_connect(self, addr):
     """Connect to TCP addr"""
     self.tcp.connect(addr)
-    msg = input()
-    while msg != 'exit':
-      self.tcp.send(msg.encode())
-      msg = input()
-    self.tcp.close()
+    print("Client: Conectado com servidor", addr)
+    # msg = input()
+    # while msg != 'exit':
+    #   self.tcp.send(msg.encode())
+    #   msg = input()
+    # self.tcp.close()
 
   def search_servers(self):
     """Send udp broadcast to search for servers"""
     self.available_servers = []
-    self.udp.sendto(b"MANDANDO BROADCAST", ('<broadcast>', UDP_PORT))
+    self.udp.sendto(b"Client: Searching servers", ('<broadcast>', UDP_PORT))
     wait_response = Thread(target=self.wait_servers_response)
     wait_response.start()
     # wait_response.join(timeout=1)
     # self.timeout_handle.set()
-    print("received", self.available_servers)
-
 
 def draw(canvas, ball_pos, paddle1_pos, paddle2_pos):
   canvas.fill(BLACK)
