@@ -80,7 +80,7 @@ class PongMenu(SceneBase):
     self.server_list = server_list
     self.server_list_text = []
     self.server_selected = None
-    font = pygame.font.Font(path.join(path.dirname(__file__), "src", "bit5x3.ttf"), 35)
+    font = pygame.font.Font(path.join(path.dirname(__file__), "src", "bit5x3.ttf"), 30)
     for server in server_list:
       text = font.render(server['tcp_addr'][0] + ':' + \
       str(server['tcp_addr'][1]), False, WHITE)
@@ -164,17 +164,27 @@ class PongMenu(SceneBase):
     y_offset - self.servers_text.get_height()))
 
     # Servers List
-    list_x_offset = x_offset + border_thick + 5
+    list_x_offset = x_offset + border_thick + 15
     list_y_offset = y_offset + border_thick + 5
     for elem in self.server_list_text:
       elem['rect'] = surface.blit(elem['text'], (list_x_offset, list_y_offset))
       list_y_offset += elem['text'].get_height()
+
+    # Selected Server
+    if self.server_selected:
+      x_pos = self.server_selected['rect'].x - 15
+      y_pos = self.server_selected['rect'].y
+      width = 10
+      height = self.server_selected['rect'].height - 5
+      pygame.draw.rect(surface, WHITE, pygame.Rect(x_pos,\
+      y_pos, width, height))
 
     # Refresh Servers Button/Text
     ref_x_offset = x_offset + rect_width - self.refresh_server_text.get_width()- 5
     ref_y_offset = y_offset + rect_height - self.refresh_server_text.get_height() - 5
     self.refresh_server_rect = surface.blit(self.refresh_server_text, (ref_x_offset, \
     ref_y_offset))
+
 
   def render_options(self, surface):
     """Draw menu options"""
@@ -260,7 +270,12 @@ class PongMenu(SceneBase):
       if elem['rect'].collidepoint(self.mouse_pos):
         # To do hover effect (also look for how to write TODO)
         is_hover = True
-        pygame.draw.rect(surface, BLACK, elem['rect'])
+        x_pos = elem['rect'].x - 15
+        y_pos = elem['rect'].y
+        width = 10
+        height = elem['rect'].height - 5
+        pygame.draw.rect(surface, WHITE, pygame.Rect(x_pos,\
+        y_pos, width, height))
 
     if not is_hover:
       self.s_render_hover = False

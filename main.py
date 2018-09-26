@@ -70,6 +70,7 @@ class Main:
       self.active_scene.create_server_clicked = False
       if self.active_scene.nic_selected:
         ip_addr = self.active_scene.nic_selected['ip']
+        self.active_scene.ref_servers_clicked = True
         self.server = Server(ip=ip_addr)
         self.server.wait_conn()
       else:
