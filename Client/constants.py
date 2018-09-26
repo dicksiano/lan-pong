@@ -1,6 +1,6 @@
 # Constants
 WIDTH = 600
-HEIGHT = 400       
+HEIGHT = 400
 BALL_RADIUS = 20
 PAD_WIDTH = 8
 PAD_HEIGHT = 80

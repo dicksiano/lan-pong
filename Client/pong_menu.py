@@ -66,6 +66,8 @@ class PongMenu(SceneBase):
     """Get ip of NIC used to create server"""
     # List of NIC
     self.nic_info = socket.gethostbyname_ex(socket.gethostname())
+    self.nic_info_text = []
+    self.nic_selected = None
     # Set font used to text
     font = pygame.font.Font(path.join(path.dirname(__file__), "src", "bit5x3.ttf"), 35)
     # For each NIC, create text surface and append it to a list
@@ -76,6 +78,8 @@ class PongMenu(SceneBase):
   def load_servers_text(self, server_list):
     """Generate servers list text based on received msg from main"""
     self.server_list = server_list
+    self.server_list_text = []
+    self.server_selected = None
     font = pygame.font.Font(path.join(path.dirname(__file__), "src", "bit5x3.ttf"), 35)
     for server in server_list:
       text = font.render(server['tcp_addr'][0] + ':' + \
@@ -136,7 +140,7 @@ class PongMenu(SceneBase):
         self.server_selected = elem
 
     # Refresh Servers
-    if self.refresh_nic_rect.collidepoint(self.mouse_pos):
+    if self.refresh_server_rect.collidepoint(self.mouse_pos):
       self.ref_servers_clicked = True
 
   def render_server_pick(self, surface):

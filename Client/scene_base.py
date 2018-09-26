@@ -90,4 +90,4 @@ class GameScene(SceneBase):
         # The game scene is just a blank blue screen
         screen.fill((0, 0, 255))
 
-run_game(400, 300, 60, TitleScene())
+# run_game(400, 300, 60, TitleScene())

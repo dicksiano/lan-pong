@@ -6,8 +6,7 @@ from random import randint
 from threading import Thread, Event
 
 import sys
-sys.path.append('../')
-import constants
+from .constants import *
 
 UDP_PORT = 13702
 TCP_PORT = 13703
@@ -27,6 +26,7 @@ class Client:
 
     self.available_servers = []
 
+    self.updated_state = False
     self.timeout_handle = Event()
 
   def wait_servers_response(self):
@@ -36,9 +36,10 @@ class Client:
       if readable:
         data, _ = self.udp.recvfrom(1024)
         self.available_servers.append(json.loads(data.decode()))
-      if self.timeout_handle.is_set():
+      else:
         print("ENCERRANDO ROLE")
         break
+    self.updated_state = True
 
   def tcp_connect(self, addr):
     """Connect to TCP addr"""
@@ -55,8 +56,8 @@ class Client:
     self.udp.sendto(b"MANDANDO BROADCAST", ('<broadcast>', UDP_PORT))
     wait_response = Thread(target=self.wait_servers_response)
     wait_response.start()
-    wait_response.join(timeout=1)
-    self.timeout_handle.set()
+    # wait_response.join(timeout=1)
+    # self.timeout_handle.set()
     print("received", self.available_servers)
 
 
