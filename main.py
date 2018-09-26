@@ -6,6 +6,7 @@ import pygame
 from Server.server import Server
 from Client.client import Client
 from Client.pong_menu import PongMenu
+from Client.game_scene import GameScene
 
 # States
 INGAME = 0
@@ -41,6 +42,7 @@ class Main:
     self.font = pygame.font.Font(path.join(path.dirname(__file__), \
     "Client", "src", "bit5x3.ttf"), 12)
     self.menu = PongMenu()
+    self.game_scene = GameScene()
     self.active_scene = self.menu
 
     # Client / Server
