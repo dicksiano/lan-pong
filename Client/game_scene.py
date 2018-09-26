@@ -8,7 +8,7 @@ class GameScene(SceneBase):
     def __init__(self):
         SceneBase.__init__(self)
     
-    def draw(self, surface, ball_pos, paddle1_pos, paddle2_pos):
+    def draw(self, surface, paddle1_pos, paddle2_pos, ball_pos):
         pygame.draw.line(surface, WHITE, [WIDTH / 2, 0],[WIDTH / 2, HEIGHT], 1)
         pygame.draw.line(surface, WHITE, [PAD_WIDTH, 0],[PAD_WIDTH, HEIGHT], 1)
         pygame.draw.line(surface, WHITE, [WIDTH - PAD_WIDTH, 0],[WIDTH - PAD_WIDTH, HEIGHT], 1)
