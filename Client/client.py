@@ -34,6 +34,7 @@ class Client:
     self.connected = False
     self.updated_state = False
     self.timeout_handle = Event()
+    self.game_state = [[0, 0], [0, 0], [0, 0], 0, 0]
 
   def wait_servers_response(self):
     """Function that handles servers response to broadcast"""
@@ -69,9 +70,9 @@ class Client:
     for s in readable:
       # print("WNTROU NO READABLE")
       data, addr = s.recvfrom(1024)
-      print("Client tcp:", data)
       if data:
-        pass
+        self.game_state = json.loads(data.decode())
+        print("Client tcp:", self.game_state)
 
     for s in writable:
       # print("WNTROU NO WRITABLE")

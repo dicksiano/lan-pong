@@ -142,7 +142,8 @@ class Main:
       if self.state == MENU:
         self.active_scene.render(self.screen)
       elif self.state == INGAME:
-        self.active_scene.draw(self.screen, [0,0], [0,0], [0,0])
+        pad1, pad2, ball, scr1, scr2 = self.client.game_state
+        self.active_scene.draw(self.screen, pad1, pad2, ball)
 
       self.render_fps()
       pygame.display.update()

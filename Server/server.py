@@ -34,6 +34,7 @@ class Server:
     self.inputs = [self.udp, self.tcp]
     self.outputs = []
     self.msg_queue = {}
+    self.cli_num = {}
 
     self.engine = Engine()
 
@@ -67,6 +68,7 @@ class Server:
     print("Server: conectado", conn, client)
     self.inputs.append(conn)
     self.msg_queue[conn] = []
+    self.cli_num[conn] = self.num_conn
     self.num_conn += 1
     # while True:
     #   msg = conn.recv(1024).decode()
@@ -74,6 +76,14 @@ class Server:
     #     break
     #   print(client, msg)
     # print('CABOU')
+
+  def process_events(self, data, conn):
+    player_num = self.cli_num[conn]
+    for event in data:
+      if event[0] == "KEYUP":
+        self.engine.keyup(event[1], player_num)
+      elif event[0] == "KEYDOWN":
+        self.engine.keydown(event[1], player_num)
 
   def running_server(self):
     """Used to run server thread"""
@@ -89,7 +99,9 @@ class Server:
           data, addr = s.recvfrom(1024)
           print("Server: tcp received", data)
           if data:
-            # data = json.loads(data)
+            data = json.loads(data.decode())
+            self.process_events(data, s)
+            self.engine.update()
             # Process received data
             self.msg_queue[s].append(self.engine.get_state())
             if s not in self.outputs:
