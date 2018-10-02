@@ -72,7 +72,7 @@ class Client:
     for s in readable:
       data, _ = s.recvfrom(1024)
       if data:
-        print("Client tcp:", data)
+        # print("Client tcp:", data)
         msg_filtered = self.handle_msg_errors(data.decode())
         self.game_state = json.loads(msg_filtered)
 

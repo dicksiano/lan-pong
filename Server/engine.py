@@ -74,7 +74,6 @@ class Engine:
 
   def keydown(self, event, player):
     """Handle keydown event"""
-    print("ARROLA")
     if player == 0:
       if event == "K_UP":
         self.paddle1_vel = -PAD_VEL

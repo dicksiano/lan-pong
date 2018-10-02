@@ -70,6 +70,22 @@ class Server:
       elif event[0] == "KEYDOWN":
         self.engine.keydown(event[1], player_num)
 
+  def filter_data(self, data):
+    """Filter repeated data at server receiving"""
+    result = []
+    string = ''
+    num_op_brack = 0
+    for char in data:
+      if char == '[':
+        num_op_brack += 1
+      elif char == ']':
+        num_op_brack -= 1
+      string += char
+      if num_op_brack == 0:
+        result.append(json.loads(string))
+        string = ''
+    return result
+
   def running_server(self):
     """Used to run server thread"""
     while True:
@@ -82,8 +98,9 @@ class Server:
           self.tcp_conn()
         else:
           data, _ = s.recvfrom(1024)
-          print("Server: tcp received", data)
+          # print("Server: tcp received", data)
           if data:
+            self.filter_data(data.decode())
             data = json.loads(data.decode())
             self.process_events(data, s)
             self.engine.update()
